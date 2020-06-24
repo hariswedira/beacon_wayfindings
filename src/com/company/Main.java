@@ -1,18 +1,13 @@
 package com.company;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Main {
 
 //    static String[] beacon01 = {"beacon01", "beacon02", "kantin", "dapur", "g1", "g5", "g6", "g7","lol"};
 //    static String[] beacon02 = {"beacon02", "beacon01", "beacon03", "mpmart", "laboran", "lol"};
 //    static String[] beacon03 = {"beacon03", "beacon02", "g9", "beacon04"};
-//    static String[] beacon04 = {"beacon04", "beacon03", "beacon05", "lobby", "g9"};
-//    static String[] beacon05 = {"beacon05", "beacon04", "beacon06", "beacon07", "g11", "lak"};
-//    static String[] beacon06 = {"beacon06", "beacon05", "g8", "g2", "g3", "g4"};
-//    static String[] beacon07 = {"beacon07", "beacon05", "beacon08", "lift", "admin", "dosen lb", "g12"};
-//    static String[] beacon08 = {"beacon08", "beacon07", "toilet", "exit"};
-//    static String[][] beacon = {beacon01, beacon02, beacon03, beacon04, beacon05, beacon06, beacon07, beacon08};
 //    static String[][] beacon = {beacon01, beacon02, beacon03};
 
     static ArrayList<String> rute;
@@ -30,37 +25,126 @@ public class Main {
     static ArrayList<String> s;
     static String end;
 
+    static String[] label = {"beacon01","beacon02","beacon03","beacon04","g1","g5","g6","g7","g9","kitchen","laboran","mp mart","kantin"};
+    static int[][] matrix = {{0,15,0,0,13,14,11,8,0,7,0,0,10},
+            {15,0,5,0,0,0,0,0,0,0,6,4,0},
+            {0,5,0,7,0,0,0,0,5,0,0,0,0},
+            {0,0,7,0,0,0,0,0,0,0,0,0,0},
+            {13,0,0,0,0,0,0,0,0,0,0,0,0},
+            {14,0,0,0,0,0,0,0,0,0,0,0,0},
+            {11,0,0,0,0,0,0,0,0,0,0,0,0},
+            {8,0,0,0,0,0,0,0,0,0,0,0,0},
+            {0,0,5,0,0,0,0,0,0,0,0,0,0},
+            {7,0,0,0,0,0,0,0,0,0,0,0,0},
+            {0,6,0,0,0,0,0,0,0,0,0,0,0},
+            {0,4,0,0,0,0,0,0,0,0,0,0,0},
+            {10,0,0,0,0,0,0,0,0,0,0,0,0}};
+    static boolean[] visit = new boolean[matrix.length];
+
     public static void main(String[] args) {
-//        start = beacon01[0];
-//        String end = beacon02[3];
 
-//        rute = new ArrayList<>();
-//        visited = new ArrayList<>();
-//        neightboar = new ArrayList<>();
+        backTrack("beacon03","kantin",matrix);
+//        neightboars = new ArrayList<>();
+//        unvisited = new ArrayList<>();
+//        beacon01 = new ArrayList<>();
+//        beacon02 = new ArrayList<>();
+//        beacon03 = new ArrayList<>();
+//        beacon = new ArrayList<>();
+//        rutes = new ArrayList<>();
+//        s = new ArrayList<>();
+//
+//        initDataAllBeacon();
+//        s = beacon02;
+//        end = "g9";
+//        uhuy(s, end);
+//
+//        System.out.println("\nRute : ");
+//
+//        if (end.equalsIgnoreCase("g9") && s.get(0).equalsIgnoreCase("beacon01")){
+//            rutes.remove(2);
+//        }
+//        if (end.equalsIgnoreCase("g9") && s.get(0).equalsIgnoreCase("beacon02")){
+//            rutes.remove(1);
+//        }
+//        for (int i = 0; i < rutes.size(); i++) {
+//            System.out.println(rutes.get(i));
+//        }
 
-//        visited.add("beacon01");
-//        findPath(start, end);
-//        findWay(start, end);
+    }
 
-        neightboars = new ArrayList<>();
-        unvisited = new ArrayList<>();
-        beacon01 = new ArrayList<>();
-        beacon02 = new ArrayList<>();
-        beacon03 = new ArrayList<>();
-        beacon = new ArrayList<>();
-        rutes = new ArrayList<>();
-        s = new ArrayList<>();
+    private static void backTrack(String start, String end, int[][] matrix){
+        int startIndex = startPoint(start);
+        int endIndex = endPoint(end);
+        Stack<Integer> stackVertex = new Stack<>();
 
-        initDataAllBeacon();
-        s = beacon01;
-        end = "g9";
-        uhuy(s, end);
+        visit[startIndex] = true;
+        stackVertex.push(startIndex);
+        boolean meet = false;
 
-        System.out.println("\nRute : ");
-        for (int i = 0; i < rutes.size(); i++) {
-            System.out.println(rutes.get(i));
+        while (!stackVertex.isEmpty()){
+            System.out.println("Stack : "+stackVertex.toString());
+            int vertexAsal = stackVertex.peek();
+            if (vertexAsal == endIndex){
+                meet = true;
+                break;
+            }else {
+                int vertexTujuan = -1;
+                for (int i = 0; i < matrix[vertexAsal].length ; i++) {
+                    int weight = matrix[vertexAsal][i];
+                    boolean isVisited = visit[i];
+                    if (weight > 0 && !isVisited){
+                        vertexTujuan = i;
+                        break;
+                    }
+                }
+
+                if (vertexTujuan != -1){
+                    stackVertex.push(vertexTujuan);
+                    visit[vertexTujuan] = true;
+                }else {
+                    stackVertex.pop();
+                }
+            }
         }
 
+        if (meet && !stackVertex.isEmpty()){
+            System.out.print("Path : "+label[startIndex]);
+            int totalWeight = 0;
+            for (int i = 1; i < stackVertex.size(); i++) {
+                int va = stackVertex.get(i-1);
+                int vb = stackVertex.get(i);
+                int weight = matrix[va][vb];
+                totalWeight += weight;
+                System.out.print(" - "+label[vb]);
+            }
+            System.out.println("\nTotal jarak : "+totalWeight);
+        }
+
+
+    }
+
+    private static int startPoint(String start){
+        int point = 0;
+
+        for (int i = 0; i < label.length; i++) {
+            if (label[i].equalsIgnoreCase(start)){
+                point = i;
+            }
+        }
+
+        return point;
+    }
+
+    private static int endPoint(String end){
+        int point = 0;
+
+        for (int i = 0; i < label.length; i++) {
+            if (label[i].equalsIgnoreCase(end)){
+                point = i;
+            }
+        }
+
+        return point;
     }
 
     private static void initDataAllBeacon() {
@@ -120,7 +204,7 @@ public class Main {
                                             !starts.get(0).equalsIgnoreCase(aBeacon.get(0))) {
                                         // Masukin tetangga ke neighboar, buat diperiksa nanti
                                         neightboars.add(aBeacon);
-                                        System.out.println("tetangga " + starts.get(0) + " : " + aBeacon.get(0));
+//                                        System.out.println("tetangga " + starts.get(0) + " : " + aBeacon.get(0));
                                         // Ada tetangga dengan id:beacon
                                         beaconExist = true;
                                     }
@@ -128,19 +212,18 @@ public class Main {
                             }
                         }
                     }
-
-                    // Kalo ada tetangga id:beacon
-//                    if (beaconExist) {
-//                        // Masukin start ke rute
-//                        rutes.add(starts.get(0));
-//                        // Pindahin posisi start ke tetangga pertama
-//                        starts = neightboars.get(0);
-//                        // Hapus tetangga yg jadi target pindah
-//                        neightboars.remove(0);
-//                    }
                 }
             }
-//TODO : PROBLEM -> Periksa kalo neightboars sudah divist maka tidak perlu di cek kemabali
+//            System.out.println(starts.get(0));
+//            for (ArrayList<String> neightboar1 : neightboars) {
+//                System.out.println("n : " + neightboar1.get(0));
+//            }
+//            for (String anUnvisited : unvisited) {
+//                System.out.println("u : " + anUnvisited);
+//            }
+//            System.out.println(beaconExist);
+//            System.out.println();
+//TODO : PROBLEM -> Periksa kalo neightboars sudah divist maka tidak perlu di cek kembali
             if (beaconExist) {
                 // Masukin start ke rute
                 if (!meet){
@@ -156,20 +239,20 @@ public class Main {
     }
 
 //    private static void findPath(String[] starts, String end) {
-//        String pos[] = starts;
-//        boolean meet = false;
-//        boolean way = false;
-//        boolean isBeaconExist = false;
-//
-//        while (!meet) {
-//            // Menambahkan beacon saat ini ke visited dan rute
-//            visited.add(pos[0]);
-////            rute.add(pos[0]);
-//            if (neightboar.isEmpty()) {
-//                // Perulangan pencarian
-//                for (int i = 0; i < pos.length; i++) {
-//                    // Jika tetangga sama dengan tujuan akhir
-//                    if (pos[i].equalsIgnoreCase(end)) {
+////        String pos[] = starts;
+////        boolean meet = false;
+////        boolean way = false;
+////        boolean isBeaconExist = false;
+////
+////        while (!meet) {
+////            // Menambahkan beacon saat ini ke visited dan rute
+////            visited.add(pos[0]);
+//////            rute.add(pos[0]);
+////            if (neightboar.isEmpty()) {
+////                // Perulangan pencarian
+////                for (int i = 0; i < pos.length; i++) {
+////                    // Jika tetangga sama dengan tujuan akhir
+////                    if (pos[i].equalsIgnoreCase(end)) {
 //                        rute.add(pos[0]);
 //                        rute.add(end);
 //                        way = true;
@@ -243,7 +326,7 @@ public class Main {
 //            findPath(pos, end);
 //        }
 //    }
-
+//
 //    private static void showPath(String[] start, String end) {
 //
 //        for (int i = 0; i < beacon.length; i++) {
